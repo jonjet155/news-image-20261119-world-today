@@ -80,10 +80,16 @@ def die(message):
 def main():
     """Copy the bundled front page to the output directory."""
     out_dir = Path(os.environ.get("OUTPUT_DIR", "/output"))
-    out_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        return die(f"cannot create output directory {out_dir}: {exc}")
     target = out_dir / "entry.png"
 
-    blob = SOURCE.read_bytes()
+    try:
+        blob = SOURCE.read_bytes()
+    except OSError as exc:
+        return die(f"cannot read the bundled picture {SOURCE}: {exc}")
     size = measure(blob)
     if size is None:
         return die("entry.png is not a readable PNG or JPEG")
